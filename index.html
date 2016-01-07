@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html>
+	<!--▶-->
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<title>MySigma</title>
+		<script src="js/PCorMobile.js"></script>
+		<link rel="stylesheet" href="css/style.css" />
+		<link rel="stylesheet" href="module/slide/css/styles.css" />
+		<link rel="stylesheet" href="css/foundation.min.css" />
+		<link rel="stylesheet" href="module/bg/css/styles.css" />
+		<script src="js/lib/jquery-2.1.4.min.js"></script>
+	</head>
+
+	<body scroll="no">
+		<div class="wrapper">
+			<ul class="bg-bubbles">
+				<li></li>
+				<li></li>
+				<li></li>
+				<li></li>
+				<li></li>
+				<li></li>
+				<li></li>
+				<li></li>
+				<li></li>
+				<li></li>
+				<li></li>
+				<li></li>
+			</ul>
+
+		</div>
+		<div style="position: absolute;top: 0;width: 100%;height: 100%;padding: 0;margin: 0;padding: 15px;">
+
+			<div class="row shine_blue_5" id="head">
+				<p id="title" style="font-size: 100%;line-height: 200%;">MySigma</p>
+			</div>
+			<div class="row shine_blue_5" id="body" style="height: 80%;border-left: 2px solid #f80;border-right: 2px solid #f80;">
+				<div id="gbody">
+					<div id="formContainer">
+						<div id="firstside" class="container">
+							<div id="face">
+								<p style="font-size: 130px;color: #f80;margin-bottom: 0;margin-top: -20px;" class="shine_bluetext_3">∑</p>
+								<p class="flipLink gameBtn" style="margin-top: -10px;" onclick="chooseLevel()">Level Game</p>
+								<p class="flipLink gameBtn" style="display: none;" onclick="beginOldGame()" id="loadOldBtn">Load Previous Game</p>
+								<p class="flipLink gameBtn" onclick="startEG()">Eternal Game</p>
+								<p class="gameBtn" onclick="help()">Help</p>
+							</div>
+							<div id="help">
+								<h2 style="color: #f80;">Introduction</h3>
+								<h3 style="color: #f80;">How to play</h4>
+								<p>Select several numbers whose sum equals what game requires. Each number must connect with another one by one.</p>
+								<h3 style="color: #f80;">Version Information</h4>
+								<p>Version: 0.1
+								<br/>Persented by NOVA
+								<br/>Fellowing MIT license</p>
+							</div>
+						</div>
+						<div id="secondside" class="container">
+							<div style="width: 100%;" id="backcontainer">
+								<section id="homeScreen">
+									<div id="mask">
+										<div id="allScreens"></div>
+									</div>
+								<ul id="indicators"></ul>
+							</section>
+						</div>
+						<div style="width: 100%;" id="game">
+							<div style="width: 100%;">
+								<div class="columns small-6" style="border-right:2px solid #f80;border-bottom: 4px solid #f80;" id="score">Score: 0</div>
+								<div class="columns small-6" style="border-left:2px solid #f80;border-bottom: 4px solid #f80;" id="sum">Sum: 0</div>
+							</div>
+							<div style="width: 100%;" id="gameText"></div>
+							<div style="width: 100%;">
+								<div id="gameContainer" style="width: 100%;padding: 5px;position: absolute;top:50%">
+								</div>
+								<div id="pauseDiv">
+									<h2 style="color: #f80;">Game is Paused</h2>
+								<h3 style="color: #f80;">Click here to continue</h3>
+							</div>
+						</div>
+						<div id="gameCase">
+							Time: 0
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		</div>
+		<div class="row shine_blue_5" id="foot">
+			<p id="tail" class="flipLink" onclick="back()">Back</p>
+			<div class="columns small-6" id="pauseBtn">
+				<p class="commonBtn" onclick="dealGame(this)" id="dealBtn">Start</p>
+			</div>
+			<div class="columns small-6" id="backBtn">
+				<p class="commonBtn flipLink" onclick="backFromGame()">Back</p>
+			</div>
+			<div class="columns small-6" id="backBtn2">
+				<p class="commonBtn" onclick="backToLevel()">Back</p>
+			</div>
+			<p id="closeHelp" onclick="closeHelp()">Go back</p>
+			<p class="commonBtn" onclick="playMusic()">♫</p>
+		</div>
+		</div>
+		<audio id="music" loop="loop">
+			<source src="_www/media/background.mp3"></source>
+		</audio>
+	</body>
+	<script src="js/map.js"></script>
+	<script src="module/slide/js/touchable.js"></script>
+	<script src="module/slide/js/init.js"></script>
+	<script src="js/storage.js"></script>
+	<script src="js/game.js"></script>
+	<script type="text/javascript">
+		var mySigma = new MySigma();
+		$(function() {
+			if (hasOldGame == "true") {
+				$("#loadOldBtn").css("display", "");
+			}
+			var allIcons, allScreens, icon, stage, _i, _len, _results;
+			allIcons = [];
+			for (var i = 1; i < map.length; i++) {
+				if (i <= levelData.level) {
+					allIcons.push(new Icon('unlock', i + "", levelData.star[i]));
+				} else {
+					allIcons.push(new Icon('lock', i + ""));
+				}
+			}
+			allScreens = $('#allScreens');
+			allScreens.Touchable();
+			stage = new Stage(allIcons);
+			stage.addScreensTo(allScreens);
+			stage.addIndicatorsTo('#indicators');
+			allScreens.bind('touchablemove', function(e, touch) {
+				if (touch.currentDelta.x < -5) {
+					canFlip = false;
+					setTimeout(function() {
+						canFlip = true
+					}, 500);
+					stage.next();
+				}
+				if (touch.currentDelta.x > 5) {
+					canFlip = false;
+					setTimeout(function() {
+						canFlip = true
+					}, 500);
+					return stage.previous();
+				}
+			});
+			mySigma.getSize();
+			stage.screenWidth = $("#homeScreen").width();
+			$("#backcontainer").css("display", "none");
+		})
+		var isPlay = false;
+
+		function playMusic() {
+			music = document.getElementById("music");
+			isPlay = !isPlay;
+			if (isPlay) {
+				//				music.play();
+				startPlay("_www/media/background.mp3");
+			} else {
+				stopPlay()
+					//				music.pause();
+			}
+		}
+
+		function help() {
+			$("#face").css("display", "none");
+			$("#help").fadeIn("500");
+			$("#closeHelp").fadeIn("500");
+		}
+
+		function closeHelp() {
+			$("#help").css("display", "none");
+			$("#face").fadeIn("500");
+			$("#closeHelp").fadeOut("500");
+		}
+
+		function back() {
+			$("#title").text("MySigma");
+			$("#backcontainer").fadeOut("1000");
+			$("#tail").fadeOut("500");
+			//mySigma.quitGame();
+		}
+
+		function chooseLevel() {
+			$("#title").text("Choose Level");
+			$("#backcontainer").fadeIn("1000");
+			$("#tail").fadeIn("1000");
+		}
+
+		function startEG() {
+			$("#gameContainer").css("display", "");
+			$("#pauseDiv").css("display", "none");
+			mySigma = new MySigma();
+			mySigma.map = map[0];
+			previousLevel = 0;
+			mySigma.modelName = mySigma.map.gameModel;
+			$("#gameText").text(mySigma.map.text);
+			$("#gameContainer").empty();
+			$("#dealBtn").text("Start");
+			$("#gameCase").text("Time: 0");
+			for (var i = 0; i < mySigma.map.width * mySigma.map.width; i++) {
+				$("#gameContainer").append("<div class='numBox num' onmousedown='chooseNumber(this)'></div>")
+			}
+			$(".num").css("width", (100 - mySigma.map.width) / mySigma.map.width + "%");
+			$(".num").css("font-size", $(".num").width() * 0.7 + "px").css("line-height", $(".num").width() * 1.3 + "px").css("border", $(".num").width() * 0.2 + "px solid");
+			hightestScore ? $("#title").text("Highest Score: " + hightestScore) : $("#title").text("Highest Score: 0");
+			$("#game").fadeIn("1000");
+			$("#pauseBtn").fadeIn("1000");
+			$("#backBtn").fadeIn("1000");
+			$(".numBox").height($(".numBox").width());
+			$("#gameContainer").css("margin-top", $("#gameContainer").width() / (-2) + "px");
+			$(".numBox").css("font-size", ($(".numBox").width() * 0.7) + "px").css("padding", ($(".numBox").width() * 0.3) + "px");
+			var numList = document.getElementsByClassName("numBox");
+			for (var i = 0; i < numList.length; i++) {
+				$(numList[i]).text(mySigma.map.number[Math.floor(Math.random() * mySigma.map.number.length)]).attr("key", i);
+			}
+			addGameWord(mySigma.modelName);
+		}
+
+		function beginOldGame() {
+			$("#gameContainer").css("display", "");
+			$("#pauseDiv").css("display", "none");
+			var data = JSON.parse(savedGameData);
+			mySigma = new MySigma();
+			mySigma.map = map[0];
+			previousLevel = 0;
+			mySigma.modelName = data.gameModel;
+			$("#gameContainer").css("display", "");
+			$("#pauseDiv").css("display", "none");
+			mySigma.isOldGame = true;
+			$("#sum").text("Sum: " + mySigma.sum);
+			$("#score").text("Score: " + mySigma.userScore);
+			localStorage.hasOldGame = false;
+			$("#gameContainer").empty();
+			$("#dealBtn").text("Pause");
+			$("#gameCase").text("Time: " + data.time);
+			for (var i = 0; i < mySigma.map.width * mySigma.map.width; i++) {
+				$("#gameContainer").append("<div class='numBox num' onmousedown='chooseNumber(this)'></div>");
+			}
+			$(".num").css("width", (100 - mySigma.map.width) / mySigma.map.width + "%");
+			$(".num").css("font-size", $(".num").width() * 0.7 + "px").css("line-height", $(".num").width() * 1.3 + "px").css("border", $(".num").width() * 0.2 + "px solid");
+			hightestScore ? $("#title").text("Highest Score: " + hightestScore) : $("#title").text("Highest Score: 0");
+			$("#game").fadeIn("1000");
+			$("#pauseBtn").fadeIn("1000");
+			$("#backBtn").fadeIn("1000");
+			$(".numBox").height($(".numBox").width());
+			$("#gameContainer").css("margin-top", $("#gameContainer").width() / (-2) + "px");
+			$(".numBox").css("font-size", ($(".numBox").width() * 0.7) + "px").css("padding", ($(".numBox").width() * 0.3) + "px");
+			var numList = document.getElementsByClassName("numBox");
+			for (var i = 0; i < numList.length; i++) {
+				$(numList[i]).text(data.numBox[i]).attr("key", i);
+			}
+			addGameWord(mySigma.modelName);
+			mySigma.startGame();
+			mySigma.gameModel.time = data.time;
+		}
+
+		function backFromGame() {
+			localStorage.hasOldGame = "false";
+			$("#title").text("MySigma");
+			$("#game").fadeOut("1000");
+			$("#pauseBtn").fadeOut("1000");
+			$("#backBtn").fadeOut("1000");
+			mySigma.quitGame();
+			$("#score").text("Score: 0");
+			$("#sum").text("Sum: 0");
+		}
+
+		function backToLevel() {
+			$("#gameContainer").css("display", "none");
+			$("#pauseBtn").css("display", "none");
+			$("#backBtn").css("display", "none");
+			$("#backBtn2").css("display", "none");
+			$("#pauseDiv").css("display","none");
+			$("#backcontainer").fadeIn(500);
+			$("#title").text("Choose Level");
+			$("#game").css("display", "none");
+			$("#tail").fadeIn(500);
+			initFlashBorder();
+			localStorage.hasOldGame = "false";
+			mySigma.quitGame();
+			$("#score").text("Score: 0");
+			$("#sum").text("Sum: 0");
+		}
+
+		function chooseNumber(obj) {
+			if (mySigma.gameStatus == mySigma.GAME_START) {
+				if (mySigma.arrayChoose.length == 0) {
+					mySigma.arrayChoose.push(obj);
+					$(obj).addClass("numBoxChoose").removeClass("numBox");
+					mySigma.userSum += parseInt($(obj).text());
+				} else {
+					if (mySigma.arrayChoose.indexOf(obj) == -1) {
+						var firstId = $(mySigma.arrayChoose[mySigma.arrayChoose.length - 1]).attr("key");
+						var secondId = $(obj).attr("key");
+						var minus = firstId - secondId;
+						//alert(minus);
+						if (minus == 1 || minus == -1 || minus == mySigma.map.width || minus == -mySigma.map.width) {
+							mySigma.arrayChoose.push(obj);
+							$(obj).addClass("numBoxChoose").removeClass("numBox");
+							mySigma.userSum += parseInt($(obj).text());
+						}
+					}
+				}
+				if (mySigma.userSum >= mySigma.sum) {
+					mySigma.gameModel.eliminate();
+				}
+			}
+		}
+		var isClick2 = false;
+
+		function dealGame(obj) {
+			if (isClick2) {
+				return;
+			}
+			isClick2 = true;
+			setTimeout(function() {
+				isClick2 = false;
+			}, 500);
+			//开始
+			if (mySigma.gameStatus == mySigma.GAME_OVER) {
+				if ($(obj).text() != "Retry") {
+					$("#gameContainer").css("display", "");
+					$("#pauseDiv").css("display", "none");
+					mySigma.startGame();
+					$("#sum").text("Sum: " + mySigma.sum);
+					$(obj).text("Pause");
+				} else {
+					retry()
+				}
+			} else if (mySigma.gameStatus == mySigma.GAME_START) {
+				//暂停
+				mySigma.gameStatus = mySigma.GAME_PAUSE;
+				$(obj).text("Continue");
+				$("#gameContainer").hide();
+				$("#pauseDiv").fadeIn(500);
+			} else if (mySigma.gameStatus == mySigma.GAME_PAUSE) {
+				//继续
+				mySigma.gameStatus = mySigma.GAME_START;
+				$(obj).text("Pause");
+				$("#pauseDiv").hide();
+				$("#gameContainer").fadeIn(500);
+			}
+		}
+		var isClick = false;
+
+		function openLevelGame(e, level) {
+			var obj = event.srcElement ? event.srcElement : event.target;
+			if (!$(obj).hasClass("icon")) {
+				return;
+			}
+			if (isClick) {
+				return;
+			}
+			if (levelData.level < level) {
+				return;
+			}
+			isClick = true;
+			setTimeout(function() {
+				isClick = false;
+			}, 100);
+			$("#gameContainer").fadeIn(500);
+			$("#backcontainer").css("display", "none");
+			mySigma = new MySigma();
+			mySigma.map = map[level];
+			previousLevel = level;
+			mySigma.modelName = mySigma.map.gameModel;
+			$("#gameText").text(mySigma.map.text);
+			$("#gameContainer").empty();
+			$("#dealBtn").text("Start");
+			$("#gameCase").text("Time: 0");
+			for (var i = 0; i < mySigma.map.width * mySigma.map.width; i++) {
+				$("#gameContainer").append("<div class='numBox num' onmousedown='chooseNumber(this)'></div>")
+			}
+			$(".num").css("width", (100 - mySigma.map.width) / mySigma.map.width + "%");
+			$(".num").css("font-size", $(".num").width() * 0.7 + "px").css("line-height", $(".num").width() * 1.3 + "px").css("border", $(".num").width() * 0.2 + "px solid");
+			$("#title").text("Level: " + level);
+			$("#game").fadeIn("500");
+			$("#pauseBtn").fadeIn("500");
+			$("#backBtn2").fadeIn("500");
+			$("#tail").css("display", "none");
+			$(".numBox").height($(".numBox").width());
+			$("#gameContainer").css("margin-top", $("#gameContainer").width() / (-2) + "px");
+			$(".numBox").css("font-size", ($(".numBox").width() * 0.7) + "px").css("padding", ($(".numBox").width() * 0.3) + "px");
+			var numList = document.getElementsByClassName("numBox");
+			for (var i = 0; i < numList.length; i++) {
+				$(numList[i]).text(mySigma.map.number[Math.floor(Math.random() * mySigma.map.number.length)]).attr("key", i);
+			}
+			stopBubble(e);
+		}
+
+		function retry() {
+			$("#gameContainer").fadeIn(500);
+			$("#backcontainer").css("display", "none");
+			mySigma = new MySigma();
+			mySigma.map = map[previousLevel];
+			mySigma.modelName = mySigma.map.gameModel;
+			$("#gameText").text(mySigma.map.text);
+			$("#gameContainer").empty();
+			$("#dealBtn").text("Start");
+			$("#gameCase").text("Time: 0");
+			for (var i = 0; i < mySigma.map.width * mySigma.map.width; i++) {
+				$("#gameContainer").append("<div class='numBox num' onmousedown='chooseNumber(this)'></div>")
+			}
+			$(".num").css("width", (100 - mySigma.map.width) / mySigma.map.width + "%");
+			$(".num").css("font-size", $(".num").width() * 0.7 + "px").css("line-height", $(".num").width() * 0.42 + "px").css("border", $(".num").width() * 0.08 + "px solid");
+			$("#title").text("Level: " + previousLevel);
+			$("#game").fadeIn("500");
+			$("#pauseBtn").fadeIn("500");
+			$("#backBtn2").fadeIn("500");
+			$("#tail").css("display", "none");
+			$(".numBox").height($(".numBox").width());
+			$("#gameContainer").css("margin-top", $("#gameContainer").width() / (-2) + "px");
+			$(".numBox").css("font-size", ($(".numBox").width() * 0.7) + "px").css("padding", ($(".numBox").width() * 0.3) + "px");
+			var numList = document.getElementsByClassName("numBox");
+			for (var i = 0; i < numList.length; i++) {
+				$(numList[i]).text(mySigma.map.number[Math.floor(Math.random() * mySigma.map.number.length)]).attr("key", i);
+			}
+			addGameWord(mySigma.modelName);
+		}
+
+		function nextLevel() {
+			previousLevel++;
+			$("#gameContainer").fadeIn(500);
+			$("#backcontainer").css("display", "none");
+			mySigma = new MySigma();
+			mySigma.map = map[previousLevel];
+			mySigma.modelName = mySigma.map.gameModel;
+			$("#gameText").text(mySigma.map.text);
+			$("#gameContainer").empty();
+			$("#dealBtn").text("Start");
+			$("#gameCase").text("Time: 0");
+			for (var i = 0; i < mySigma.map.width * mySigma.map.width; i++) {
+				$("#gameContainer").append("<div class='numBox num' onmousedown='chooseNumber(this)'></div>")
+			}
+			$(".num").css("width", (100 - mySigma.map.width) / mySigma.map.width + "%");
+			$(".num").css("font-size", $(".num").width() * 0.7 + "px").css("line-height", $(".num").width() * 0.42 + "px").css("border", $(".num").width() * 0.08 + "px solid");
+			$("#title").text("Level: " + previousLevel);
+			$("#game").fadeIn("500");
+			$("#pauseBtn").fadeIn("500");
+			$("#backBtn2").fadeIn("500");
+			$("#tail").css("display", "none");
+			$(".numBox").height($(".numBox").width());
+			$("#gameContainer").css("margin-top", $("#gameContainer").width() / (-2) + "px");
+			$(".numBox").css("font-size", ($(".numBox").width() * 0.7) + "px").css("padding", ($(".numBox").width() * 0.3) + "px");
+			var numList = document.getElementsByClassName("numBox");
+			for (var i = 0; i < numList.length; i++) {
+				$(numList[i]).text(mySigma.map.number[Math.floor(Math.random() * mySigma.map.number.length)]).attr("key", i);
+			}
+			addGameWord(mySigma.modelName);
+		}
+
+		function stopBubble(e) {
+			// 如果传入了事件对象，那么就是非ie浏览器  
+			if (e && e.stopPropagation) {
+				//因此它支持W3C的stopPropagation()方法  
+				e.stopPropagation();
+			} else {
+				//否则我们使用ie的方法来取消事件冒泡  
+				window.event.cancelBubble = true;
+			}
+		}
+
+		function initFlashBorder() {
+			$("#head").removeClass("shine_blue_0").removeClass("shine_blue_1").removeClass("shine_blue_2").removeClass("shine_blue_3").removeClass("shine_blue_4").addClass("shine_blue_5")
+			$("#body").removeClass("shine_blue_0").removeClass("shine_blue_1").removeClass("shine_blue_2").removeClass("shine_blue_3").removeClass("shine_blue_4").addClass("shine_blue_5")
+			$("#foot").removeClass("shine_blue_0").removeClass("shine_blue_1").removeClass("shine_blue_2").removeClass("shine_blue_3").removeClass("shine_blue_4").addClass("shine_blue_5")
+		}
+
+		function addGameWord(str) {
+			if (str == "eternalGame") {
+				$("#score").text("Score: 0");
+				$("#sum").text("Sum: 0");
+				$("#gameCase").text("Time: 0");
+			} else if (str == "timeCorrectGame") {
+				$("#score").text("Correct: 0");
+				$("#sum").text("Sum: 0");
+				$("#gameCase").text("Time: 0");
+			} else if (str == "timeScoreGame") {
+				$("#score").text("Score: 0");
+				$("#sum").text("Sum: 0");
+				$("#gameCase").text("Time: 0");
+			} else if (str == "timeNumberGame") {
+				$("#score").text("Amount: 0");
+				$("#sum").text("Sum: 0");
+				$("#gameCase").text("Time: 0");
+			} else if (str == "timeAmountGame") {
+				$("#score").text("Amount: 0");
+				$("#sum").text("Sum: 0");
+				$("#gameCase").text("Time: 0");
+			} else {}
+		}
+	</script>
+	<script src="js/flip.js"></script>
+	<script type="text/javascript">
+		var p = null;
+		 // 开始播放
+		function startPlay(url) {
+			p = plus.audio.createPlayer(url);
+			p.play(function() {
+				startPlay("_www/media/background.mp3");
+			}, function(e) {
+				outLine("播放音频文件\"" + url + "\"失败：" + e.message);
+			});
+		}
+
+		function stopPlay() {
+			if (p) {
+				p.stop();
+				p = null;
+			}
+		}
+
+		function plusReady() {
+			// 隐藏滚动条
+			plus.webview.currentWebview().setStyle({
+				scrollIndicator: 'none'
+			});
+			// Android处理返回键
+			plus.key.addEventListener('backbutton', function() {
+				if (confirm('Are you sure to exit？')) {
+					plus.runtime.quit();
+				}
+			}, false);
+		}
+		if (window.plus) {
+			plusReady();
+		} else {
+			document.addEventListener('plusready', plusReady, false);
+		}
+	</script>
+
+</html>

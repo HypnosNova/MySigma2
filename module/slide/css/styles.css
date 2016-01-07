@@ -1,0 +1,107 @@
+a, a:visited {
+	text-decoration:none;
+	outline:none;
+	color:#54a6de;
+}
+
+a:hover{
+	text-decoration:underline;
+}
+
+section, footer{
+	display: block;
+}
+
+
+/*----------------------------
+	The Home Screen
+-----------------------------*/
+
+
+#homeScreen{
+	width:100%;
+	height:100%;
+}
+
+/* The mask shows only one screen at the time. Uses oveflow:hidden */
+
+#mask{
+	width: 100%;
+	height:400px;
+	position: relative;
+	overflow: hidden;
+}
+
+#allScreens{
+	height:600%;
+	top:0;
+	left:0;
+	position:absolute;
+	cursor:move;
+}
+
+.screen{
+	width: 332px;
+	float:left;
+}
+
+.screen .icon{
+	float:left;
+	width:60px;
+	height:60px;
+	background-repeat: no-repeat;
+	margin: 10px;
+	position: relative;
+}
+
+/* Displaying the title attribute below the icon: */
+
+.screen .icon:after{
+	bottom: -15px;
+	color: white;
+	content: attr(title);
+	font-size: 12px;
+	height: 20px;
+	left: -20px;
+	overflow: hidden;
+	position: absolute;
+	text-align: center;
+	white-space: nowrap;
+	width: 100px;
+	text-shadow: 0 0 3px #222;
+}
+
+.star{
+	position: absolute;
+	width: 60px;
+	margin-top: -2px;
+	text-align: center;
+	font-size: 12px;
+}
+
+/* The dock icons get subtle shadows below them */
+
+#indicators{
+	text-align:center;
+	list-style: none;
+	margin-left: 0;
+	margin-top: -25px;
+	
+}
+
+#indicators li{
+	
+	border-radius:50%;
+	display: inline-block;
+	margin:7px;
+	width:6px;
+	height:6px;
+	background-color:#f80;
+	opacity:0.6;
+}
+
+#indicators li.active{
+	opacity:1;
+	background-color:#88f;
+	box-shadow: 0 0 3px #00A2D6, 0 0 1px #51CFF9 inset;
+}
